@@ -6,7 +6,7 @@ class range_sum {
 public: 
     range_sum(std::vector<int>& nums) {
         n = nums.size(); 
-        tree = std::vector<int>(4 * n); 
+        tree = std::vector<int>(3 * n); 
         build_tree(nums, 0, n - 1, 0); 
     }
 
