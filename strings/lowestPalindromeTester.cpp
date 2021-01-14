@@ -2,9 +2,9 @@
 #include <iostream>
 #include "lowestPalindrome.cpp"
 #include <chrono> 
-#define SLEN 500000
-#define ITERATIONS 3
-#define BRUTEFORCE 0
+#define SLEN 500000 // string length
+#define ITERATIONS 3 // iterations
+#define BRUTEFORCE 0 // compare result with brute force result (brute force time complexity: O(26^SLEN))
 
 string randString() {
   string ans;

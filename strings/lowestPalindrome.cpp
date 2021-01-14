@@ -1,3 +1,8 @@
+/**
+ * Find the lexicographically lowest palindrome string with length s0.length that is 
+ * lexicographically larger than s0
+ * */
+
 #ifndef LOWESTPALINDROME_CPP
 #define LOWESTPALINDROME_CPP
 
