@@ -76,8 +76,8 @@ def getMinimalCover(fds):
     mbs = getMinimalBasis(fds)
     mp = dict()
     for _fd in mbs:
-        strLhs = ','.join(_fd.lhs)
-        strRhs = ','.join(_fd.rhs)
+        strLhs = ','.join(sorted(list(_fd.lhs)))
+        strRhs = ','.join(sorted(list(_fd.rhs)))
         if strLhs not in mp:
             mp[strLhs] = set()
 
