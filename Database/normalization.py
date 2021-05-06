@@ -30,8 +30,21 @@ def weakSuperset(superset, subset):
     sub = set(subset)
     return spr != sub and spr.union(sub) == spr
 
-def checkFdEq(fds1, fds2):
-    
+def checkFdEq(fds1, fds2, verbose=False):
+    if verbose:
+        isEq = True
+        for _fd in fds1:
+            if not _fd.rhs.issubset(closure(_fd.lhs, fds2)):
+                print("fds1: {} not represented in fds2".format(_fd))
+                isEq = False
+        for _fd in fds2:
+            if not _fd.rhs.issubset(closure(_fd.lhs, fds1)):
+                print("fds2: {} not represented in fds1".format(_fd))
+                isEq = False
+
+        print("fds1: {} and fds2: {} are {}EQUAL".format(';'.join([str(i) for i in fds1]), ';'.join([str(i) for i in fds2]), "" if isEq else "NOT "))
+        return isEq
+
     def intCheck(_fds1, _fds2, cont):
         return all([_fd.rhs.issubset(closure(_fd.lhs, _fds2)) for _fd in _fds1]) and (not cont or intCheck(_fds2, _fds1, False))
 
@@ -125,7 +138,7 @@ class relation():
     def isSupKey(self, subAttrs):
         return closure(subAttrs, self.fds) == self.attrs
     
-    def getKeys(self):
+    def getKeys(self, verbose=False):
         
         if not (self.minKeys is None or self.supKeys is None):
             return (self.minKeys, self.supKeys)
@@ -144,6 +157,8 @@ class relation():
                 curComb.remove(currAttr)
             except StopIteration:
                 if self.isSupKey(curComb):
+                    if verbose:
+                        print("{{{}}}+ => {{{}}}".format(','.join(curComb), ','.join(closure(curComb, self.fds))))
                     supKeys.append(copy.copy(curComb))
         iterCombs(iter(self.attrs))
         
@@ -197,7 +212,8 @@ class relation():
                 print("lhs not super key: {}, closure(lhs) = {}".format(_fd, ','.join(closure(_fd.lhs, self.fds))))
 
             violation = True
-
+        if verbose:
+            print("{} is BCNF".format(self) if not violation else "{} is NOT BCNF".format(self))
         return not violation
 
     def is3NF(self, verbose=False):
@@ -227,10 +243,12 @@ class relation():
 
             violation = True
 
+        if verbose:
+            print("{} is 3NF".format(self) if not violation else "{} is NOT 3NF".format(self))
         return not violation
             
 
-    def decomp3NF(self):
+    def decomp3NF(self, verbose=False):
         decomp = []
         needsKey = True
         
@@ -240,32 +258,51 @@ class relation():
         for _fd in getMinimalCover(self.fds):
             if not any([_fd.lhs.union(_fd.rhs).issubset(i.attrs) for i in decomp]):
                 decomp.append(self.getProjection(_fd.lhs.union(_fd.rhs)))
-
-                #if not decomp[-1].is3NF():
-                    #raise Exception("Decomposed Relation was not 3NF")
+                
+                if verbose:
+                    print("Add relation to 3NF decomp: {}".format(decomp[-1]))
+                    self.isBCNF(verbose=True)
+                    
 
                 if any([k.issubset(decomp[-1].attrs) for k in self.getKeys()[0]]):
                     needsKey = False
+                    if verbose:
+                        print("relation {} contains attributes of key {{{}}}".format(decomp[-1], ','.join(k)))
         
         if needsKey:
+            if verbose:
+                print("No decomp relations contain a key so far")
+
             (k, _) = self.getKeys()
             decomp.append(self.getProjection(copy.copy(k[0])))
+
+            if verbose: 
+                print("Add relation to 3NF decomp: {}".format(decomp[-1]))
+                self.isBCNF(verbose=True)
+
         
         return decomp
 
-    def decompBCNF(self):
+    def decompBCNF(self, verbose=False):
         decomp = []
-        self.decompHelper(decomp)
+        self.decompHelper(decomp, verbose, "")
+        if verbose:
+            unionFds = []
+            [unionFds.extend(el.fds) for el in decomp]
+            print("DEPENDENCY PRESERVING BCNF DECOMP" if checkFdEq(self.fds, unionFds, verbose=True) else "NOT DEPENDENCY PRESERVING BCNF DECOMP")
         return decomp
         
-    def decompHelper(self, decompSet):
+    def decompHelper(self, decompSet, verbose, idstr):
         for _fd in self.fds:
             if not (_fd.rhs.issubset(_fd.lhs) or self.isSupKey(_fd.lhs)):
                 Xp = closure(_fd.lhs, self.fds)
-                self.getProjection(Xp).decompHelper(decompSet)
-                self.getProjection(self.attrs - (Xp - _fd.lhs)).decompHelper(decompSet)
+                if verbose:
+                    print("NOT BCNF, continue recursion: {}: {}".format(idstr, self))
+                self.getProjection(Xp).decompHelper(decompSet, verbose, idstr + "_1")
+                self.getProjection(self.attrs - (Xp - _fd.lhs)).decompHelper(decompSet, verbose, idstr + "_2")
                 return
-            
+        if verbose: 
+            print("BCNF, stop recursion: {}: {}".format(idstr, self))
         decompSet.append(self)
 
 

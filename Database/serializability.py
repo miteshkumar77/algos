@@ -74,8 +74,14 @@ def isSerializable(strinput):
 # inputstr = "r2(y) r1(x) r3(y) w2(y) r2(z) r1(z) w2(z) w3(z) w1(x)"
 # inputstr = "r3(y) w3(y) r1(x) r1(y) w1(x) r2(x) r2(z) w3(z) w2(w)"
 
-inputstr = "r1(w) r2(x) r2(y) r1(x) w2(z) r3(z) w3(z) w1(x) w3(x) r3(y) w3(y)"
+#inputstr = "r1(w) r2(x) r2(y) r1(x) w2(z) r3(z) w3(z) w1(x) w3(x) r3(y) w3(y)"
+
+inputstr = "r1(x) w1(x) w1(z) w3(z) r4(z) w2(w) r4(w) r2(w) r3(x) r2(z) w4(w) w4(z)"
+
 conflicts = getConflictsBrutalForce(inputstr)
+
+for c in conflicts:
+    print(c)
 
 isSer = isSerializable(inputstr)
 

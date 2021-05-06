@@ -175,7 +175,7 @@ if __name__ == "__main__":
     print("IS 3NF" if MusicGroup.is3NF() else "IS NOT 3NF")
     
     print("BCNF DECOMP")
-    for dr in MusicGroup.decompBCNF():
+    for dr in MusicGroup.decompBCNF(verbose=True):
         print(dr)
         print("IS 3NF" if dr.is3NF() else "IS NOT 3NF")
         print("IS BCNF" if dr.isBCNF() else "IS NOT BCNF")
