@@ -79,6 +79,17 @@ class TestNormalization(unittest.TestCase):
 
 if __name__ == "__main__":
     # unittest.main()
+    
+    attrs = norm.parseAttrs("A,B,C,D,E,F,G")
+    fds = norm.parseFds("A,C->B,F;B,E->F,G;B,G->E;A,G->B,E;E,F->D")
+    R = norm.relation(attrs, fds)
+    
+    l = [R.getProjection(norm.parseAttrs(i)) for i in ["A,F,G", "A,B,C,F", "B,D,E,F","A,B,E,G"]]
+    norm.isLosslessChaseTest(l, fds, verbose=True)
+
+
+
+    exit()
 
     attrs = norm.parseAttrs("A,B,C,D,E,F,G")
     fds = norm.parseFds("A,C->D;A,C->E;B,F->E;A,F,G->B;B,D->C")

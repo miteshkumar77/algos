@@ -1,4 +1,6 @@
 import copy 
+import texttable
+
 def closure(attrs, fds):
     c = copy.copy(attrs)
     csz = len(c)
@@ -101,6 +103,62 @@ def getMinimalCover(fds):
         mcv.append(fd(parseAttrs(k), parseAttrs(','.join(v))))
     return mcv
     
+def isLosslessChaseTest(decomp, allfds=[], verbose=False):
+
+    def printChaseBoard(bd):
+        txttbl = texttable.Texttable()
+        txttbl.set_cols_align(["c" for _ in range(len(bd[0]))])
+        txttbl.set_cols_valign(["c" for _ in range(len(bd[0]))])
+        rows = [[k for k in sorted(list(bd[0].keys()))]] + [[d[k] if d[k] != 0 else ' ' for k in sorted(list(d.keys()))] for d in bd]
+        txttbl.add_rows(rows)
+        print(txttbl.draw() + "\n")
+
+
+    allattrs = set() 
+    [allattrs.update(d.attrs) for d in decomp]
+    allfds = getMinimalBasis(allfds)
+    
+    table = []
+    for idx, r in enumerate(decomp):
+        table.append({k:(0 if k in r.attrs else idx + 1) for k in allattrs})
+    
+    changed = True
+    finished = False
+    if verbose:
+        print("Start Chase Algorithm")
+        printChaseBoard(table)
+    
+    while changed and not finished:
+        changed = False
+        for _fd in allfds:
+            commonSubScripts = dict()
+            for row in table:
+                rowId = '|'.join([str(row[fdAttr]) for fdAttr in sorted(list(_fd.lhs))])
+                if not rowId in commonSubScripts:
+                    commonSubScripts[rowId] = row[list(_fd.rhs)[0]]
+                else:
+                    commonSubScripts[rowId] = min(commonSubScripts[rowId], row[list(_fd.rhs)[0]])
+            
+            for row in table:
+                rowId = '|'.join([str(row[fdAttr]) for fdAttr in sorted(list(_fd.lhs))])
+                
+                if row[list(_fd.rhs)[0]] != commonSubScripts[rowId]:
+                    row[list(_fd.rhs)[0]] = commonSubScripts[rowId]
+                    finished = finished or all([v == 0 for v in row.values()])
+                    changed = True
+                
+            if changed:
+                if verbose:
+                    print("Apply {}".format(_fd))
+                    printChaseBoard(table)
+                break
+    
+    if verbose:
+        if finished:
+            print("Row without subscripts. Lossless decomposition")
+        else:
+            print("No row without subscripts. Lossy decomosition")
+    return finished
 
 class fd():
     
