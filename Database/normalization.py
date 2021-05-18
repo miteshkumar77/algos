@@ -205,7 +205,7 @@ class relation():
         self.supKeys = None
 
     def __repr__(self):
-        return "R({})\nF{{{}}}".format(','.join(sorted(list(self.attrs))), ';'.join([str(f) for f in self.fds]))
+        return "R({})   F{{{}}}".format(','.join(sorted(list(self.attrs))), ';'.join([str(f) for f in self.fds]))
 
     def isSupKey(self, subAttrs):
         return closure(subAttrs, self.fds) == self.attrs
