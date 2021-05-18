@@ -13,19 +13,34 @@ def closure(attrs, fds):
         nsz = len(c)
     return c
 
+
 def parseAttrs(strattrs):
-    return set(strattrs.strip().split(','))
+    
+    ret = set([a.strip() for a in strattrs.strip().split(',')])
+        
+    if strattrs == "":
+        return (set(), "Empty attribute set not allowed")
+
+    for a in ret:
+        if len(a) == 0 or not a.isalpha():
+            return (set(), "Invalid attributes")
+    return (ret, None)
 
 def parseFds(strfds):
-    fds = strfds.split(';')
-    fds = [s1.split('->') for s1 in fds]
-    fds = [[s22.split(',') for s22 in s2] for s2 in fds]
-    return [fd(set(s3[0]), set(s3[1])) for s3 in fds]
-
-def superset(superset, subset):
-    spr = set(superset)
-    sub = set(subset)
-    return spr.union(sub) == spr
+    fds = strfds.strip().split(';')
+    fds = [s1.strip().split('->') for s1 in fds]
+    if not all([len(_fd) == 2 for _fd in fds]):
+        return ([], "Invalid functional dependency input")
+    ret = []
+    for elem in fds:
+        lhs, err = parseAttrs(elem[0])
+        if err is not None:
+            return ([], err)
+        rhs, err = parseAttrs(elem[1])
+        if err is not None:
+            return ([], err)
+        ret.append(fd(lhs, rhs))
+    return (ret, None)
 
 def weakSuperset(superset, subset):
     spr = set(superset)
@@ -54,7 +69,6 @@ def checkFdEq(fds1, fds2, verbose=False):
 
 
 def getMinimalBasis(fds):
-    
     projFds = []
     for _fd in fds:
         projFds.extend(_fd.getSplit())
@@ -100,7 +114,7 @@ def getMinimalCover(fds):
     
     mcv = []
     for k, v in mp.items():
-        mcv.append(fd(parseAttrs(k), parseAttrs(','.join(v))))
+        mcv.append(fd(parseAttrs(k)[0], parseAttrs(','.join(v))[0]))
     return mcv
     
 def isLosslessChaseTest(decomp, allfds=[], verbose=False):
@@ -362,9 +376,4 @@ class relation():
         if verbose: 
             print("BCNF, stop recursion: {}: {}".format(idstr, self))
         decompSet.append(self)
-
-
-
-
-
 
