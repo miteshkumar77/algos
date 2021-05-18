@@ -73,6 +73,9 @@ class TestParsing(unittest.TestCase):
                 ]
         for t in tests:
             self.assertEqual((norm.closure(norm.parseAttrs(t[0])[0], fds)), norm.parseAttrs(t[2])[0], "closure wrong ans")
+        
+        
+    
 
 
 if __name__ == "__main__":
