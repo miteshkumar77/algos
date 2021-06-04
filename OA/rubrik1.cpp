@@ -2,8 +2,27 @@
 using namespace std;
 
 /*
-	Array1 = [4,2,3,1,5,6]
-	Array2 = [3,1,4,6,5,2]
+Given two arrays of size N each containing the elements 1 to N, find the minimum number of operations needed to transform the second array into the first.
+
+An operation is defined as:
+Taking any current value in an array and moving it to the beginning or end.
+
+Example:
+Turn Array2 into Array1
+
+Array1 = [4,2,3,1,5,6]
+Array2 = [3,1,4,6,5,2]
+
+Returns 3:
+
+Operation 1: Move 2 to beginning.
+Array2 = [2,3,1,4,6,5]
+
+Operation 2: Move 4 to beginning.
+Array2 = [4,2,3,1,6,5]
+
+Operation 3: Move 6 to end:
+Array2 = [4,2,3,1,5,6]
 */
 
 int solve(vector<int>& a1, vector<int>& a2) {
