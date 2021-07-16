@@ -6,6 +6,11 @@
 
 using namespace std;
 
+/*
+In an array arr[] of distinct elements, count the number of pairs of indices i,j where i < j and min(arr[i], arr[j]) >= min(arr[i], arr[i+1], ..., arr[j]).
+*/
+
+
 int solveSlow(vector<int>& nums) {
   int n = nums.size();
   int ans = 0;
@@ -24,14 +29,13 @@ int solveFast(vector<int>& nums) {
   if (nums.size() <= 1) return nums.size();
   vector<int> stk;
   int n = nums.size();
-  int ans = nums.size()-1;
+  int ans = 0;
   for (int i = 0; i < n; ++i) {
-    if (!stk.empty() && nums[i] > nums[stk.back()]) stk.pop_back();
     while(!stk.empty() && nums[i] > nums[stk.back()]) {
       stk.pop_back();
       ++ans;
     }
-    if (!stk.empty() && stk.back() + 1 < i) ++ans;
+    ans += !stk.empty();
     stk.push_back(i);
   }
   return ans;
