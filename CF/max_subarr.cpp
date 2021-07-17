@@ -7,7 +7,7 @@
 using namespace std;
 
 /*
-In an array arr[] of distinct elements, count the number of pairs of indices i,j where i < j and min(arr[i], arr[j]) >= min(arr[i], arr[i+1], ..., arr[j]).
+In an array arr[] of distinct elements, count the number of pairs of indices i,j where i < j and min(arr[i], arr[j]) >= max(arr[i], arr[i+1], ..., arr[j]).
 */
 
 
